@@ -1,0 +1,41 @@
+root = true
+
+[*]
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8-bom
+
+[*.cs]
+indent_size = 4
+dotnet_sort_system_directives_first = true
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_require_accessibility_modifiers = always:warning
+dotnet_style_readonly_field = true:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# Nombres de variables/miembros descriptivos: prohíbe nombres de una sola letra salvo en loops triviales.
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.style = camel_case_with_underscore
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.camel_case_with_underscore.required_prefix = _
+dotnet_naming_style.camel_case_with_underscore.capitalization = camelCase
+
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_prefer_braces = true:warning
+csharp_new_line_before_open_brace = all
+
+# Code smells que el reto pide evitar explícitamente.
+dotnet_diagnostic.CS0168.severity = warning   # Variable declarada pero nunca usada
+dotnet_diagnostic.CS0219.severity = warning   # Variable asignada pero nunca usada
+dotnet_diagnostic.IDE0051.severity = warning  # Miembro privado no usado
+dotnet_diagnostic.IDE0052.severity = warning  # Miembro privado asignado pero no usado
+dotnet_diagnostic.IDE0005.severity = warning  # Using innecesario

@@ -1,0 +1,30 @@
+# Build artifacts
+bin/
+obj/
+out/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+.idea/
+
+# Test results and coverage
+TestResults/
+coverage/
+coverage-report/
+*.trx
+
+# User secrets / environment
+appsettings.*.local.json
+.env
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# OS files
+.DS_Store
+Thumbs.db

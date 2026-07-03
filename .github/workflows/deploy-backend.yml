@@ -1,0 +1,47 @@
+name: Deploy .NET API to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore packages
+        run: dotnet restore TrycoreEvm.sln
+
+      - name: Build
+        run: dotnet build TrycoreEvm.sln --configuration Release --no-restore
+
+      - name: Publish API
+        run: |
+          dotnet publish src/TrycoreEvm.Api/TrycoreEvm.Api.csproj \
+            -c Release \
+            -o publish \
+            --no-build
+
+      - name: Zip publish
+        run: |
+          cd publish
+          zip -r ../deploy.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-package
+          path: backend/deploy.zip
