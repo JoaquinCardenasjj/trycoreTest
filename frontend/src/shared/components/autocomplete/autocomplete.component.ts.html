@@ -1,0 +1,35 @@
+<div class="autocomplete-container">
+    @if (label()) {
+    <label class="autocomplete-label">{{ label() }}</label>
+    }
+
+    <div class="input-wrapper">
+        <input type="text" [placeholder]="placeholder()" [value]="busqueda()" (input)="onInput($event)"
+            (blur)="onBlur()" (focus)="busqueda().length > 0 ? mostrarSugerencias.set(true) : null"
+            class="autocomplete-input" />
+
+        @if (busqueda()) {
+        <button type="button" class="clear-btn" (click)="limpiar()">&times;</button>
+        }
+    </div>
+
+    @if (mostrarSugerencias() && opciones().length > 0) {
+    <ul class="suggestions-list">
+        @for (opcion of opciones(); track opcion.id) {
+        <li class="suggestion-item" (click)="seleccionarOpcion(opcion)">
+            <span class="main-text">{{ labelMostrar() }}{{ opcion[campoMostrar()] }}</span>
+            @if (subCampoMostrar()) {
+            <span class="sub-text"> - {{ subLabelMostrar() }}{{ opcion[subCampoMostrar()] }}</span>
+            }
+            @if (subCampoMostrarDos()) {
+            <span class="sub-text"> - {{ subLabelMostrarDos() }} <b>{{ opcion[subCampoMostrarDos()] }} </b></span>
+            }
+        </li>
+        }
+    </ul>
+    } @else if (mostrarSugerencias() && busqueda().trim().length > 0) {
+    <div class="suggestions-list no-results">
+        ⚠️ No se encontraron coincidencias
+    </div>
+    }
+</div>

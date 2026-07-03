@@ -1,0 +1,7 @@
+@if (notificationService.toast().visible) {
+  <div class="toast-card" [class]="notificationService.toast().tipo">
+    <div class="toast-content">
+      <span class="toast-text">{{ notificationService.toast().mensaje }}</span>
+    </div>
+  </div>
+}
