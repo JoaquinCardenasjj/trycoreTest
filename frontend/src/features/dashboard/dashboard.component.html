@@ -4,6 +4,27 @@
             <div>
                 <h1>Dashboard de Proyectos</h1>
                 <p>Supervisa actividades, evalúa indicadores EVM y ajusta el rumbo en tiempo real.</p>
+                <div class="indicator-explanation">
+                    <div>
+                        <strong>PV</strong> = Valor Planificado: presupuesto autorizado según el cronograma.
+                    </div>
+                    <div>
+                        <strong>EV</strong> = Valor Ganado: valor del trabajo realmente completado.
+                    </div>
+                    <div>
+                        <strong>AC</strong> = Costo Actual: gasto real incurrido hasta la fecha.
+                    </div>
+
+                    <div>
+                        <strong>SPI</strong> = Índice de Rendimiento de Cronograma: EV / PV, mide la eficiencia del
+                        tiempo.
+                    </div>
+                    <div>
+                        <strong>CPI</strong> = Índice de Rendimiento de Costo: EV / AC, mide si el gasto está bajo o
+                        sobre
+                        el presupuesto.
+                    </div>
+                </div>
             </div>
             <div class="header-actions">
                 <button class="btn btn-primary" (click)="openCreateProject()">Crear proyecto</button>
