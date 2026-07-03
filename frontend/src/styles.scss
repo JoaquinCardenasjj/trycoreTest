@@ -1,0 +1,162 @@
+/* You can add global styles to this file, and also import other style files */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #0f172a;
+}
+
+// ==========================================
+// ARQUITECTURA TRANSVERSAL PARA FORMULARIOS
+// ==========================================
+
+// Contenedor estándar para centrar pantallas de formularios (Login, Registro, etc.)
+.fx-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 70px);
+  box-sizing: border-box;
+}
+
+// Tarjeta base para envolver formularios
+.fx-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+  
+  // Tamaños estándar configurables
+  &.max-sm { max-width: 450px; }
+  &.max-md { max-width: 700px; }
+  &.max-lg { max-width: 1000px; }
+}
+
+// Encabezados uniformes
+.fx-header {
+  margin-bottom: 28px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+
+  h2 {
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  p {
+    color: #64748b;
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// Grid de distribución flexible
+.fx-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+
+  &.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+  }
+}
+
+// Estructura de Control (Inputs, Selects, Labels)
+.fx-group {
+  display: flex;
+  flex-direction: column;
+  
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+  
+  input, select, textarea {
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    background-color: #f8fafc;
+    color: #0f172a;
+    transition: all 0.15s ease-in-out;
+    width: 100%;
+    box-sizing: border-box;
+    
+    &:focus {
+      border-color: #2563eb;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    &::placeholder { color: #94a3b8; }
+    
+    // Al acoplar con las validaciones reactivas de Angular
+    &.ng-touched.ng-invalid {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+      &:focus { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12); }
+    }
+  }
+
+  .fx-error {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  &.full-width {
+    grid-column: span 2;
+    @media (max-width: 640px) { grid-column: span 1; }
+  }
+}
+
+// Botones de acción transversales
+.fx-btn {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &.btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+    &:hover:not(:disabled) { background-color: #1d4ed8; }
+  }
+  
+  &.btn-secondary {
+    background-color: #e2e8f0;
+    color: #334155;
+    &:hover:not(:disabled) { background-color: #cbd5e1; }
+  }
+
+  &:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+}
