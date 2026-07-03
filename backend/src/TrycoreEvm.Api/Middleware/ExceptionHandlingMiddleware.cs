@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using TrycoreEvm.Domain.Exceptions;
 
@@ -35,6 +35,7 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception exception)
         {
+            _logger.LogError(exception, "Error :: ", exception.Message);
             _logger.LogError(exception, "Error no controlado procesando la solicitud {Path}", context.Request.Path);
             await WriteProblemAsync(context, HttpStatusCode.InternalServerError, "Ocurrió un error inesperado procesando la solicitud.");
         }
