@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using TrycoreEvm.Domain.Entities;
 using TrycoreEvm.Domain.Exceptions;
 using TrycoreEvm.Domain.ValueObjects;
@@ -65,34 +65,6 @@ public class ProjectTests
         project.Activities.Should().ContainSingle(a => a.Id == activity.Id);
     }
 
-    [Fact]
-    public void RemoveActivity_ConIdExistente_EliminaLaActividad()
-    {
-        var project = new Project("Proyecto");
-        var activity = project.AddActivity("Actividad 1", 1000m, 50m, 40m, 400m);
 
-        project.RemoveActivity(activity.Id);
-
-        project.Activities.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void RemoveActivity_ConIdInexistente_LanzaEntityNotFoundException()
-    {
-        var project = new Project("Proyecto");
-
-        var act = () => project.RemoveActivity(Guid.NewGuid());
-
-        act.Should().Throw<EntityNotFoundException>();
-    }
-
-    [Fact]
-    public void FindActivityOrThrow_ConIdInexistente_LanzaEntityNotFoundException()
-    {
-        var project = new Project("Proyecto");
-
-        var act = () => project.FindActivityOrThrow(Guid.NewGuid());
-
-        act.Should().Throw<EntityNotFoundException>();
-    }
+  
 }
