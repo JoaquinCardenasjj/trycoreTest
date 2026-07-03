@@ -45,3 +45,19 @@ jobs:
         with:
           name: deploy-package
           path: backend/deploy.zip
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          application_name: trycore-api
+          environment_name: trycore-api-prod
+          version_label: ${{ github.sha }}
+          region: us-east-2
+          deployment_package: backend/deploy.zip
+        
