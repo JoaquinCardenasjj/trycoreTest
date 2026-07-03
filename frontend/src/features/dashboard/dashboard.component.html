@@ -1,33 +1,285 @@
 <div class="dashboard-layout">
     <main class="main-content">
-
         <header class="main-header">
             <div>
-                <h1>Panel de Control de trycoretest</h1>
-                <p>Bienvenido, ultima prueba del git hub action </p>
+                <h1>Dashboard de Proyectos</h1>
+                <p>Supervisa actividades, evalúa indicadores EVM y ajusta el rumbo en tiempo real.</p>
             </div>
-            <div class="badge-status">
-                🟢 Servidor en Nube Activo
+            <div class="header-actions">
+                <button class="btn btn-primary" (click)="openCreateProject()">Crear proyecto</button>
+                <span class="badge-status">🟢 API Activa</span>
             </div>
         </header>
 
-        <section class="kpi-grid">
+        <section class="dashboard-top-grid">
+            <aside class="panel-section project-panel">
+                <div class="panel-title-row">
+                    <h2>Proyectos</h2>
+                    <span class="small-label">{{ projects().length }} encontrados</span>
+                </div>
+                <div class="project-list">
+                    <button *ngFor="let project of projects()" type="button" class="project-item"
+                        [class.selected]="project.id === activeProjectId()" (click)="selectProject(project.id)">
+                        <div>
+                            <strong>{{ project.name }}</strong>
+                            <p>{{ project.activityCount }} actividades</p>
+                        </div>
+                        <div class="project-metrics">
+                            <span>PV</span>
+                            <strong>{{ project.consolidatedIndicators.plannedValue | number:'1.0-0' }}</strong>
+                        </div>
+                    </button>
+                </div>
+            </aside>
 
-        </section>
+            <section class="panel-section summary-panel" *ngIf="selectedProject() as project; else noProjectSelected">
+                <div class="panel-title-row">
+                    <h2>Indicadores consolidados</h2>
+                    <div class="indicator-statuses">
+                        <span class="status-chip"
+                            [class.good]="getPerformanceClass(project.consolidatedIndicators.costPerformanceIndex) === 'good'"
+                            [class.warning]="getPerformanceClass(project.consolidatedIndicators.costPerformanceIndex) === 'warning'"
+                            [class.critical]="getPerformanceClass(project.consolidatedIndicators.costPerformanceIndex) === 'critical'">
+                            CPI {{ project.consolidatedIndicators.costPerformanceIndex !== null ?
+                            (project.consolidatedIndicators.costPerformanceIndex | number:'1.2-2') : 'N/A' }}
+                        </span>
+                        <span class="status-chip"
+                            [class.good]="getPerformanceClass(project.consolidatedIndicators.schedulePerformanceIndex) === 'good'"
+                            [class.warning]="getPerformanceClass(project.consolidatedIndicators.schedulePerformanceIndex) === 'warning'"
+                            [class.critical]="getPerformanceClass(project.consolidatedIndicators.schedulePerformanceIndex) === 'critical'">
+                            SPI {{ project.consolidatedIndicators.schedulePerformanceIndex !== null ?
+                            (project.consolidatedIndicators.schedulePerformanceIndex | number:'1.2-2') : 'N/A' }}
+                        </span>
+                    </div>
+                </div>
 
-        <div class="dashboard-details-grid">
+                <div class="kpi-grid summary-kpis">
+                    <article class="kpi-card">
+                        <h3>Planned Value (PV)</h3>
+                        <div class="number">{{ project.consolidatedIndicators.plannedValue | number:'1.0-0' }}</div>
+                    </article>
+                    <article class="kpi-card">
+                        <h3>Earned Value (EV)</h3>
+                        <div class="number">{{ project.consolidatedIndicators.earnedValue | number:'1.0-0' }}</div>
+                    </article>
+                    <article class="kpi-card">
+                        <h3>Actual Cost (AC)</h3>
+                        <div class="number">{{ project.consolidatedIndicators.actualCost | number:'1.0-0' }}</div>
+                    </article>
+                </div>
 
-            <section class="panel-section alerts-section">
-                <h2>⚠️ Alertas Proactivas de Vencimiento</h2>
-                <div class="alerts-list">
-
+                <div class="analysis-text">
+                    <p>{{ project.consolidatedIndicators.costInterpretation }}</p>
+                    <p>{{ project.consolidatedIndicators.scheduleInterpretation }}</p>
                 </div>
             </section>
+        </section>
 
-            <section class="panel-section audit-section">
+        <section class="panel-section activities-section" *ngIf="selectedProject() as project; else noProjectSelected">
+            <div class="section-header">
+                <div>
+                    <h2>Actividades</h2>
+                    <p>Actualiza avance, costo y presupuesto para ver los indicadores en caliente.</p>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-secondary" type="button" (click)="openAddActivity()">Nueva actividad</button>
+                    <button class="btn btn-secondary" type="button" (click)="openRenameProject()">Renombrar
+                        proyecto</button>
+                </div>
+            </div>
 
+            <div class="notifications" *ngIf="successMessage() || errorMessage()">
+                <div class="notification success" *ngIf="successMessage()">{{ successMessage() }}</div>
+                <div class="notification error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+            </div>
+
+            <div class="activity-dashboard">
+                <div class="chart-panel">
+                    <h3>Comparativo PV / EV / AC por actividad</h3>
+                    <div class="chart-list">
+                        <div class="chart-row" *ngFor="let activity of project.activities || []">
+                            <div class="chart-label">{{ activity.name || 'Actividad sin nombre' }}</div>
+                            <div class="chart-bars">
+                                <div class="bar-label">PV {{ activity.indicators.plannedValue | number:'1.0-0' }}</div>
+                                <div class="bar-line">
+                                    <span class="bar-segment pv"
+                                        [style.width.%]="chartWidth(activity.indicators.plannedValue)"></span>
+                                </div>
+                                <div class="bar-label">EV {{ activity.indicators.earnedValue | number:'1.0-0' }}</div>
+                                <div class="bar-line">
+                                    <span class="bar-segment ev"
+                                        [style.width.%]="chartWidth(activity.indicators.earnedValue)"></span>
+                                </div>
+                                <div class="bar-label">AC {{ activity.indicators.actualCost | number:'1.0-0' }}</div>
+                                <div class="bar-line">
+                                    <span class="bar-segment ac"
+                                        [style.width.%]="chartWidth(activity.indicators.actualCost)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-panel">
+                    <table class="activities-table">
+                        <thead>
+                            <tr>
+                                <th>Actividad</th>
+                                <th>Presupuesto</th>
+                                <th>Avance planificado</th>
+                                <th>Avance real</th>
+                                <th>CPI</th>
+                                <th>SPI</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let activity of project.activities || []">
+                                <td>{{ activity.name || '—' }}</td>
+                                <td>{{ activity.budgetAtCompletion | number:'1.0-0' }}</td>
+                                <td>{{ activity.plannedPercentComplete | percent:'1.0-0' }}</td>
+                                <td>{{ activity.actualPercentComplete | percent:'1.0-0' }}</td>
+                                <td>
+                                    <span class="status-tag"
+                                        [class.good]="getPerformanceClass(activity.indicators.costPerformanceIndex) === 'good'"
+                                        [class.warning]="getPerformanceClass(activity.indicators.costPerformanceIndex) === 'warning'"
+                                        [class.critical]="getPerformanceClass(activity.indicators.costPerformanceIndex) === 'critical'">
+                                        {{ activity.indicators.costPerformanceIndex !== null ?
+                                        (activity.indicators.costPerformanceIndex | number:'1.2-2') : 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-tag"
+                                        [class.good]="getPerformanceClass(activity.indicators.schedulePerformanceIndex) === 'good'"
+                                        [class.warning]="getPerformanceClass(activity.indicators.schedulePerformanceIndex) === 'warning'"
+                                        [class.critical]="getPerformanceClass(activity.indicators.schedulePerformanceIndex) === 'critical'">
+                                        {{ activity.indicators.schedulePerformanceIndex !== null ?
+                                        (activity.indicators.schedulePerformanceIndex | number:'1.2-2') : 'N/A' }}
+                                    </span>
+                                </td>
+                                <td class="actions-cell">
+                                    <button class="btn btn-ghost" type="button"
+                                        (click)="openEditActivity(activity)">Editar</button>
+                                    <button class="btn btn-danger" type="button"
+                                        (click)="deleteActivity(activity)">Eliminar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <ng-template #noProjectSelected>
+            <section class="panel-section empty-state">
+                <h2>Ningún proyecto seleccionado</h2>
+                <p>Selecciona un proyecto existente o crea uno nuevo para comenzar a trabajar con sus actividades.</p>
             </section>
-
-        </div>
+        </ng-template>
     </main>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddActivityModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Agregar actividad</h3>
+            <button type="button" class="close-button" aria-label="Cerrar" (click)="closeModals()">×</button>
+        </div>
+        <form (ngSubmit)="submitNewActivity()">
+            <label>
+                Nombre de la actividad
+                <input type="text" [(ngModel)]="activityForm().name" name="activityName"
+                    placeholder="Ej. Desarrollo módulo" />
+            </label>
+            <div class="form-grid">
+                <label>
+                    Presupuesto (BAC)
+                    <input type="number" [(ngModel)]="activityForm().budgetAtCompletion" name="budgetAtCompletion"
+                        min="0" step="0.01" />
+                </label>
+                <label>
+                    Avance planificado %
+                    <input type="number" [(ngModel)]="activityForm().plannedPercentComplete"
+                        name="plannedPercentComplete" min="0" max="100" step="0.01" />
+                </label>
+                <label>
+                    Avance real %
+                    <input type="number" [(ngModel)]="activityForm().actualPercentComplete" name="actualPercentComplete"
+                        min="0" max="100" step="0.01" />
+                </label>
+                <label>
+                    Costo real (AC)
+                    <input type="number" [(ngModel)]="activityForm().actualCost" name="actualCost" min="0"
+                        step="0.01" />
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" (click)="closeModals()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar actividad</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showEditActivityModal() && selectedActivity()">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Editar actividad</h3>
+            <button type="button" class="close-button" aria-label="Cerrar" (click)="closeModals()">×</button>
+        </div>
+        <form (ngSubmit)="submitEditActivity()">
+            <label>
+                Nombre de la actividad
+                <input type="text" [(ngModel)]="activityForm().name" name="editActivityName" />
+            </label>
+            <div class="form-grid">
+                <label>
+                    Presupuesto (BAC)
+                    <input type="number" [(ngModel)]="activityForm().budgetAtCompletion" name="editBudgetAtCompletion"
+                        min="0" step="0.01" />
+                </label>
+                <label>
+                    Avance planificado %
+                    <input type="number" [(ngModel)]="activityForm().plannedPercentComplete"
+                        name="editPlannedPercentComplete" min="0" max="100" step="0.01" />
+                </label>
+                <label>
+                    Avance real %
+                    <input type="number" [(ngModel)]="activityForm().actualPercentComplete"
+                        name="editActualPercentComplete" min="0" max="100" step="0.01" />
+                </label>
+                <label>
+                    Costo real (AC)
+                    <input type="number" [(ngModel)]="activityForm().actualCost" name="editActualCost" min="0"
+                        step="0.01" />
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" (click)="closeModals()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Actualizar actividad</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showProjectModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>{{ projectModalMode() === 'create' ? 'Crear proyecto' : 'Renombrar proyecto' }}</h3>
+            <button type="button" class="close-button" aria-label="Cerrar" (click)="closeModals()">×</button>
+        </div>
+        <form (ngSubmit)="submitProjectModal()">
+            <label>
+                Nombre del proyecto
+                <input type="text" [(ngModel)]="projectForm().name" name="projectName"
+                    placeholder="Ej. Migración a la nube AWS" />
+            </label>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" (click)="closeModals()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">
+                    {{ projectModalMode() === 'create' ? 'Crear proyecto' : 'Guardar cambios' }}
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
